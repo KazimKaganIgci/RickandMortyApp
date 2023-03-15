@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#FF1100"
+    android:backgroundTint="#FF1100"
+    android:padding="5dp"
+    android:layout_height="90dp">
+
+
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="140dp"
+            android:layout_height="82dp"
+            android:text="Button"
+
+            android:padding="3dp"
+            android:textSize="13dp"
+            android:backgroundTint="#000000"
+            tools:layout_editor_absoluteX="86dp"
+            tools:layout_editor_absoluteY="194dp" />
+
+
+</LinearLayout>

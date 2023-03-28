@@ -17,17 +17,7 @@ class ButtonAdapter(var context:Context):RecyclerView.Adapter<ButtonAdapter.View
     private var data : ((Result) -> Unit)? =null
     private var selectedPosition = -1
 
-    private val diffUtil=object: DiffUtil.ItemCallback<Result>(){
-        override fun areItemsTheSame(oldItem: Result, newItem: Result): Boolean {
-           return oldItem.id ==newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Result, newItem: Result): Boolean {
-           return oldItem ==newItem
-        }
-    }
-     val differ =AsyncListDiffer(this,diffUtil)
-
+    private var oldItems = ArrayList<Result>()
 
 
 
@@ -38,7 +28,7 @@ class ButtonAdapter(var context:Context):RecyclerView.Adapter<ButtonAdapter.View
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val result =differ.currentList[position]
+        val result =oldItems[position]
         holder.binding.button.text =result.name
         var p =position
 
@@ -68,11 +58,15 @@ class ButtonAdapter(var context:Context):RecyclerView.Adapter<ButtonAdapter.View
 
     }
 
-    override fun getItemCount() =differ.currentList.size
+    override fun getItemCount() =oldItems.size
 
     fun setOnActionEditListener(callback:(Result)->Unit){
         this.data =callback
 
+    }
+    fun setData(newList: List<Result>){
+        oldItems.addAll(newList)
+        notifyDataSetChanged()
     }
 
 

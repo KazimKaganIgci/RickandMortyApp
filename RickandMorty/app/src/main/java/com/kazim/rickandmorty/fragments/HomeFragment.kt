@@ -1,14 +1,16 @@
 package com.kazim.rickandmorty.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AbsListView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.kazim.rickandmorty.adapter.ButtonAdapter
 import com.kazim.rickandmorty.adapter.CharacterAdapter
 import com.kazim.rickandmorty.data.Result
@@ -27,13 +29,16 @@ class HomeFragment : Fragment() {
     private var characterAdapter:CharacterAdapter ?=null
     private lateinit var binding:FragmentHomeBinding
     private var a =2
+    var pageNumber =1
+    var isLoading=false
+    var limit=8
     var singleList=ArrayList<SingleCharacter>(emptyList())
+
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
     }
 
@@ -54,25 +59,29 @@ class HomeFragment : Fragment() {
         setupRecyclerviewC()
         getSeries()
         getAdapterData()
-
-      binding.swipeRefresh.setOnRefreshListener {
-            refreshData()
+        refreshData()
 
 
-           binding.swipeRefresh.isRefreshing=false
-        }
+
+        viewModel.getCharacterLiveData.observe(viewLifecycleOwner, Observer {
+            if (!singleList.contains(it)){
+                singleList.add(it)
+            }
+            if (singleList.isEmpty()){
+                characterAdapter?.setData(emptyList())
+            }
+
+        })
 
             }
 
     private fun refreshData() {
 
-        viewModel.getLocationData(a)
         lifecycleScope.launch {
             viewModel.getLocationLiveData.observe(viewLifecycleOwner, Observer {
                 //buttonAdapter.differ.submitList(emptyList())
-                buttonAdapter.differ.submitList(it)
+                buttonAdapter.setData(it)
                 buttonAdapter.notifyDataSetChanged()
-                binding.swipeRefresh.isRefreshing=false
             })
 
             if (a<8){
@@ -98,7 +107,6 @@ class HomeFragment : Fragment() {
            //characterAdapter?.clearData()
             if (singleList.isEmpty()){
             }else{
-                singleList.removeAt(0)
                 characterAdapter?.setData(singleList)
 
             }
@@ -108,7 +116,7 @@ class HomeFragment : Fragment() {
 
     private fun getSeries() {
         viewModel.getSeriesLiveData.observe(viewLifecycleOwner, Observer {
-            buttonAdapter.differ.submitList(it)
+            buttonAdapter.setData(it)
 
             var list =it[0].residents
             if (list != null) {
@@ -120,7 +128,6 @@ class HomeFragment : Fragment() {
                         var idList = list[a]?.split("/")
                         var id =idList?.lastIndex?.let { lastindex -> idList?.get(lastindex)}
                         viewModel.getCharacterData(id.toString())
-                        getCharacter()
                         a++
 
                     }
@@ -133,29 +140,63 @@ class HomeFragment : Fragment() {
         }) }
 
 
-    private fun getCharacter(){
-        viewModel.getCharacterLiveData.observe(viewLifecycleOwner, Observer {
-           if (!singleList.contains(it)){
-               singleList.add(it)
-           }
-            if (singleList.isEmpty()){
-                characterAdapter?.setData(emptyList())
-            }
 
-        })
-    }
 
 
     private fun setupRecyclerview() {
         binding.overRecyclerView.apply {
             layoutManager= LinearLayoutManager(context, RecyclerView.HORIZONTAL,false)
             adapter =buttonAdapter
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dx >0){
+                        val visibleItemCount= (layoutManager as LinearLayoutManager).childCount
+                        val pastVisibleItem= (layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                        val total =buttonAdapter.itemCount
+                        if (!isLoading){
+                            if (visibleItemCount+pastVisibleItem>=total){
+                                pageNumber++
+                                viewModel.getLocationData(pageNumber)
+                                getLoad()
+                            }
+                        }
+
+                    }else{
+
+                    }
+                    super.onScrolled(recyclerView, dx, dy)
+
+
+
+
+
+                }
+            })
+
+
+
         }
     }
+
+    private fun getLoad() {
+        lifecycleScope.launch {
+        isLoading=true
+        binding.progressDialog.visibility=View.VISIBLE
+
+            delay(1500)
+            binding.progressDialog.visibility=View.GONE
+
+            isLoading=false
+        }
+    }
+
     private fun setupRecyclerviewC() {
         binding.characterRecyclerView.apply {
             layoutManager= LinearLayoutManager(context, RecyclerView.VERTICAL,false)
             adapter =characterAdapter
+
+
         }
     }
 
@@ -184,7 +225,6 @@ class HomeFragment : Fragment() {
                 var idList = list[a]?.split("/")
                 var id =idList?.lastIndex?.let { lastindex -> idList?.get(lastindex)}
                 viewModel.getCharacterData(id.toString())
-                getCharacter()
                 a++
 
 

@@ -4,6 +4,10 @@ RickandMortyApp for invio
 Video:
 
 
+https://user-images.githubusercontent.com/61113947/228294483-6c003f41-a065-4eaf-a80b-34279976e0bc.mp4
+
+
+
 
 
 ![giris](https://user-images.githubusercontent.com/61113947/225286581-f5066ba5-166d-4098-9373-37b6e62993fb.png)

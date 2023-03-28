@@ -2,7 +2,7 @@
 RickandMortyApp for invio
 
 Video:
-https://user-images.githubusercontent.com/61113947/225291381-a6301c7e-b67a-4f44-9ab5-d693f84bf2ef.mp4
+
 
 
 

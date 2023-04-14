@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -125,8 +124,8 @@ class HomeFragment : Fragment() {
                 lifecycleScope.launch {
                     while(a <list.size){
                         delay(40)
-                        var idList = list[a]?.split("/")
-                        var id =idList?.lastIndex?.let { lastindex -> idList?.get(lastindex)}
+                        val idList = list[a]?.split("/")
+                        val id =idList?.lastIndex?.let { lastindex -> idList?.get(lastindex)}
                         viewModel.getCharacterData(id.toString())
                         a++
 
@@ -157,8 +156,7 @@ class HomeFragment : Fragment() {
                         if (!isLoading){
                             if (visibleItemCount+pastVisibleItem>=total){
                                 pageNumber++
-                                viewModel.getLocationData(pageNumber)
-                                getLoad()
+                                getLoad(pageNumber)
                             }
                         }
 
@@ -179,12 +177,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun getLoad() {
+    private fun getLoad(number: Int) {
         lifecycleScope.launch {
         isLoading=true
         binding.progressDialog.visibility=View.VISIBLE
-
             delay(1500)
+            viewModel.getLocationData(pageNumber)
             binding.progressDialog.visibility=View.GONE
 
             isLoading=false
@@ -222,8 +220,8 @@ class HomeFragment : Fragment() {
             characterAdapter?.setData(emptyList())
             while(a <list.size){
                 delay(50)
-                var idList = list[a]?.split("/")
-                var id =idList?.lastIndex?.let { lastindex -> idList?.get(lastindex)}
+                val idList = list[a]?.split("/")
+                val id =idList?.lastIndex?.let { lastindex -> idList[lastindex] }
                 viewModel.getCharacterData(id.toString())
                 a++
 

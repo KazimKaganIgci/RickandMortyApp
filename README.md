@@ -1,5 +1,4 @@
 # RickandMortyApp
-RickandMortyApp for invio
 
 Video:
 
